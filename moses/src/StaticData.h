@@ -97,6 +97,9 @@ protected:
   m_translationOptionThreshold,
   m_wordDeletionWeight;
 
+  std::string m_chartpruningtagfile;
+
+
   // PhraseTrans, Generation & LanguageModelScore has multiple weights.
   int				m_maxDistortion;
   // do it differently from old pharaoh
@@ -618,6 +621,10 @@ public:
   
   long GetStartTranslationId() const
   { return m_startTranslationId; }
+
+  std::string GetChartPruningTagFile() const{
+      return m_chartpruningtagfile;
+  }
 };
 
 }

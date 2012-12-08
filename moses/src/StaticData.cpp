@@ -100,6 +100,12 @@ bool StaticData::LoadData(Parameter *parameter)
   ResetUserTime();
   m_parameter = parameter;
 
+  // chart pruning
+  if (m_parameter->GetParam("pruning-input-tags").size() == 1)
+  {
+      m_chartpruningtagfile = m_parameter->GetParam("pruning-input-tags")[0];
+  }
+
   // verbose level
   m_verboseLevel = 1;
   if (m_parameter->GetParam("verbose").size() == 1) {

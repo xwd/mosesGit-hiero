@@ -67,7 +67,7 @@ private:
 public:
   ChartManager(InputType const& source, const TranslationSystem* system);
   ~ChartManager();
-  void ProcessSentence();
+  void ProcessSentence(std::vector<std::vector<bool> > &beginEndTags);
   const ChartHypothesis *GetBestHypothesis() const;
   void CalcNBest(size_t count, ChartTrellisPathList &ret,bool onlyDistinct=0) const;
 

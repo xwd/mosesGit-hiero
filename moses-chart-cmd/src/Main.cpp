@@ -69,9 +69,10 @@ using namespace Moses;
 class TranslationTask : public Task
 {
 public:
-  TranslationTask(InputType *source, IOWrapper &ioWrapper)
-    : m_source(source)
-    , m_ioWrapper(ioWrapper)
+  TranslationTask(InputType *source, IOWrapper &ioWrapper, std::vector<std::vector<bool> > &beginEndTags)
+  : m_source(source)
+  , m_ioWrapper(ioWrapper)
+  , m_beginEndTags(beginEndTags)
   {}
 
   ~TranslationTask() {
@@ -86,7 +87,7 @@ public:
     VERBOSE(2,"\nTRANSLATING(" << lineNumber << "): " << *m_source);
 
     ChartManager manager(*m_source, &system);
-    manager.ProcessSentence();
+    manager.ProcessSentence(m_beginEndTags);
 
     //
     totalHypoCount += ChartHypothesis::GetHypoCount();
@@ -142,6 +143,8 @@ private:
 
   InputType *m_source;
   IOWrapper &m_ioWrapper;
+
+  std::vector<std::vector<bool> > &m_beginEndTags;
 };
 
 bool ReadInput(IOWrapper &ioWrapper, InputTypeEnum inputType, InputType*& source)
@@ -259,12 +262,29 @@ CALLGRIND_START_INSTRUMENTATION;
     ThreadPool pool(staticData.ThreadCount());
 #endif
   
-    // read each sentence & decode
-    InputType *source=0;
+
+    // tag-based pruning related
+    std::string tagfile = staticData.GetChartPruningTagFile();
+    m_file.open(tagfile.c_str());
+
+    std::vector<std::vector<bool> > beginEndTags;
+
+    while (true)
+    {
+    	std::vector<bool> tags;
+
+    	std::string line;
+    	if(!std::getline(m_file, line)) break;
+    	std::istringstream iss(line);
+    	ReadTags(iss, tags);
+
+    	beginEndTags.push_back(tags);
+    }
+
     while(ReadInput(*ioWrapper,staticData.GetInputType(),source)) {
       IFVERBOSE(1)
       ResetUserTime();
-      TranslationTask *task = new TranslationTask(source, *ioWrapper);
+      TranslationTask *task = new TranslationTask(source, *ioWrapper, beginEndTags);
       source = NULL;  // task will delete source
 #ifdef WITH_THREADS
       pool.Submit(task);  // pool will delete task

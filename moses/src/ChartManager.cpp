@@ -80,7 +80,7 @@ ChartManager::~ChartManager()
 
 }
 
-void ChartManager::ProcessSentence()
+void ChartManager::ProcessSentence(std::vector<std::vector<bool> >  &beginEndTags)
 {
   VERBOSE(1,"Translating: " << m_source << endl);
 
@@ -96,10 +96,27 @@ void ChartManager::ProcessSentence()
 
   // MAIN LOOP
   size_t size = m_source.GetSize();
+  size_t index = m_source.GetTranslationId() * 2;
+
   for (size_t width = 1; width <= size; ++width) {
     for (size_t startPos = 0; startPos <= size-width; ++startPos) {
       size_t endPos = startPos + width - 1;
       WordsRange range(startPos, endPos);
+
+      if (width != 1 && startPos != 0 && endPos != size - 1)
+      {
+	  if (startPos > 0 && !beginEndTags[index][startPos - 1]) {
+	      //cerr << "skipped " << startPos << " " << endPos << " " << endl;
+	      ++m_skipped;
+	      continue;
+	  }
+
+	  if (endPos < size - 1 && !beginEndTags[index + 1][endPos - 1]) {
+	      //cerr << "skipped " << startPos << " " << endPos << " " << endl;
+	      ++m_skipped;
+	      continue;
+	  }
+      }
 
       // create trans opt
       m_transOptColl.CreateTranslationOptionsForRange(range);
