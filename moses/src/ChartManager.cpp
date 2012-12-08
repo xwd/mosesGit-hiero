@@ -69,6 +69,7 @@ ChartManager::~ChartManager()
   float et = (end - m_start);
   et /= (float)CLOCKS_PER_SEC;
 
+  size_t size = m_source.GetSize();
   double skipRatio = m_skipped / (0.5 * size * (size + 1));
   size_t cellcount = (size * (size + 1) * 0.5);
 
