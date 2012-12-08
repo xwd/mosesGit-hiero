@@ -261,7 +261,9 @@ CALLGRIND_START_INSTRUMENTATION;
 #ifdef WITH_THREADS
     ThreadPool pool(staticData.ThreadCount());
 #endif
-  
+
+    // read each sentence & decode
+    InputType *source=0;
 
     // tag-based pruning related
     std::string tagfile = staticData.GetChartPruningTagFile();
@@ -271,14 +273,14 @@ CALLGRIND_START_INSTRUMENTATION;
 
     while (true)
     {
-    	std::vector<bool> tags;
+	std::vector<bool> tags;
 
-    	std::string line;
-    	if(!std::getline(m_file, line)) break;
-    	std::istringstream iss(line);
-    	ReadTags(iss, tags);
+	std::string line;
+	if(!std::getline(m_file, line)) break;
+	std::istringstream iss(line);
+	ReadTags(iss, tags);
 
-    	beginEndTags.push_back(tags);
+	beginEndTags.push_back(tags);
     }
 
     while(ReadInput(*ioWrapper,staticData.GetInputType(),source)) {
