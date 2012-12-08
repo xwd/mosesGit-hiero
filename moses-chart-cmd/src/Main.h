@@ -40,6 +40,24 @@ class IOWrapper;
 
 int main(int argc, char* argv[]);
 IOWrapper *GetIODevice(const Moses::StaticData &staticData);
+
+// tag-based pruning related
+std::ifstream m_file;
+
+bool to_bool(size_t tag) {
+     return tag != 0;
+}
+
+void ReadTags(std::istringstream &iss, std::vector<bool> &vec)
+{
+    while (iss)
+    {
+        std::string str;
+        if (!getline(iss, str, ',' )) break;
+        vec.push_back(to_bool(atoi(str.c_str())));
+    }
+}
+
 unsigned long skippedCellsCount = 0;
 unsigned long totalHypoCount = 0;
 double totalTime = 0.0;
